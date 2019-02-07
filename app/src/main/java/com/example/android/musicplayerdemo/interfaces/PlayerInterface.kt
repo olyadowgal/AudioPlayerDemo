@@ -1,8 +1,8 @@
-package com.example.android.musicplayerdemo
+package com.example.android.musicplayerdemo.interfaces
 
 
 // Allow MainActivity to control media playback of MediaPlayHolder
-interface PlayerAdapter {
+interface PlayerInterface {
 
     fun loadMedia(resourceId: Int)
 

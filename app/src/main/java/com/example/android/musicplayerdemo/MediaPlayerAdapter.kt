@@ -2,11 +2,14 @@ package com.example.android.musicplayerdemo
 
 import android.content.Context
 import android.media.MediaPlayer
+import com.example.android.musicplayerdemo.enums.State
+import com.example.android.musicplayerdemo.interfaces.PlaybackInfoListener
+import com.example.android.musicplayerdemo.interfaces.PlayerInterface
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
-class MediaPlayerHolder(context: Context) : PlayerAdapter{
+class MediaPlayerAdapter(context: Context) : PlayerInterface {
 
     companion object {
         const val PLAYBACK_POSITION_REFRESH_INTERVAL_MS = 1000

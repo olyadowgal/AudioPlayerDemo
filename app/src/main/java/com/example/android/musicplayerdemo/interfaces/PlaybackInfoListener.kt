@@ -1,4 +1,6 @@
-package com.example.android.musicplayerdemo
+package com.example.android.musicplayerdemo.interfaces
+
+import com.example.android.musicplayerdemo.enums.State
 
 interface PlaybackInfoListener {
 

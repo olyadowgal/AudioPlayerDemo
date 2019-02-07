@@ -1,10 +1,15 @@
-package com.example.android.musicplayerdemo
+package com.example.android.musicplayerdemo.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.ScrollView
 import android.widget.SeekBar
+import com.example.android.musicplayerdemo.MediaPlayerAdapter
+import com.example.android.musicplayerdemo.R
+import com.example.android.musicplayerdemo.enums.State
+import com.example.android.musicplayerdemo.interfaces.PlaybackInfoListener
+import com.example.android.musicplayerdemo.interfaces.PlayerInterface
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -14,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         const val MEDIA_RES_ID = R.raw.funky_town
     }
 
-    var mPlayerAdapter : PlayerAdapter? = null
+    var mPlayerAdapter : PlayerInterface? = null
     private var mUserIsSeeking = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,11 +58,11 @@ class MainActivity : AppCompatActivity() {
 
     //region Initializing elements
     private fun initializePlaybackController() {
-        val mMediaPlayerHolder = MediaPlayerHolder(this)
-        Log.d(TAG, "initializePlaybackController: created MediaPlayerHolder")
+        val mMediaPlayerHolder = MediaPlayerAdapter(this)
+        Log.d(TAG, "initializePlaybackController: created MediaPlayerAdapter")
         mMediaPlayerHolder.setPlaybackInfoListener(PlaybackListener())
         mPlayerAdapter = mMediaPlayerHolder
-        Log.d(TAG, "initializePlaybackController: MediaPlayerHolder progress callback set")
+        Log.d(TAG, "initializePlaybackController: MediaPlayerAdapter progress callback set")
     }
 
     private fun initializeSeekbar() {

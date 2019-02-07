@@ -1,4 +1,4 @@
-package com.example.android.musicplayerdemo
+package com.example.android.musicplayerdemo.enums
 
 enum class State(val number: Int) {
     INVALID(-1),
