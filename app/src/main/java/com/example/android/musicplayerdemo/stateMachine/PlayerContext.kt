@@ -1,11 +1,10 @@
 package com.example.android.musicplayerdemo.stateMachine
 
-import com.example.android.musicplayerdemo.MediaPlayerAdapter
+import android.content.Context
+import android.media.MediaPlayer
 
-interface Context {
-    var context: Context
-    get() = context
-    set(value) {context = value}
-    var currentState: PlayerState,
-    var musicPlayer : MediaPlayerAdapter
+interface PlayerContext {
+    val context: Context
+    val mediaPlayer: MediaPlayer
+    val playlist: MutableList<Int>
 }

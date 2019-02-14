@@ -1,4 +1,9 @@
 package com.example.android.musicplayerdemo
 
-class MainViewModel {
+import androidx.lifecycle.ViewModel
+import android.content.Context
+
+class MainViewModel : ViewModel() {
+
+
 }

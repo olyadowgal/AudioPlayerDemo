@@ -1,25 +1,53 @@
-package com.example.android.musicplayerdemo.stateMachine
+package com.example.android.musicplayerdemo.stateMachine.states
 
-import com.example.android.musicplayerdemo.MediaPlayerAdapter
+import com.example.android.musicplayerdemo.stateMachine.Action
 import com.example.android.musicplayerdemo.stateMachine.Action.*
+import com.example.android.musicplayerdemo.stateMachine.PlayerContext
 
-class PlayingState(context: PlayerContext) : State(context) {
+class PlayingState(context: PlayerContext, private var currentSong: Int) : State(context) {
 
-    override fun handleAction(action: Action) : State {
-        when (action) {
-            is Play -> {
-                context.musicPlayer = MediaPlayerAdapter(context.context)
-                context.musicPlayer.loadMedia(context.playlist[context.currSong])
-
-            }
-            is Pause -> {
-                context.musicPlayer.pause()
-            }
-            is Stop -> {
-                context.musicPlayer.reset()
-            }
+    override fun handleAction(action: Action): State = when (action) {
+        is Play -> this
+        is Pause -> {
+            context.mediaPlayer.pause()
+            PausedState(context, currentSong)
         }
-        return context.currState
+        is Stop -> {
+            context.mediaPlayer.reset()
+            IdleState(context)
+        }
+        is Next -> {
+            context.mediaPlayer.reset()
+            if (context.playlist.size -1 > currentSong) {
+                currentSong += 1
+            }else {
+                currentSong = 0
+            }
+            val assetFileDescriptor = context.context.resources.openRawResourceFd(context.playlist[currentSong])
+            try {
+                context.mediaPlayer.setDataSource(assetFileDescriptor)
+                context.mediaPlayer.prepare()
+            } catch (e: Exception) {
+            }
+            context.mediaPlayer.start()
+            PlayingState(context,currentSong)
+        }
+        is Prev -> {
+            context.mediaPlayer.reset()
+            if (currentSong > 0) {
+                currentSong -= 1
+            }else {
+                currentSong = 0
+            }
+            val assetFileDescriptor = context.context.resources.openRawResourceFd(context.playlist[currentSong])
+            try {
+                context.mediaPlayer.setDataSource(assetFileDescriptor)
+                context.mediaPlayer.prepare()
+            } catch (e: Exception) {
+            }
+            context.mediaPlayer.start()
+            PlayingState(context,currentSong)
+        }
     }
 
 
