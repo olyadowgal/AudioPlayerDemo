@@ -9,15 +9,21 @@ class PlayingState(context: PlayerContext, private var currentSong: Int) : State
     override fun handleAction(action: Action): State = when (action) {
         is Play -> this
         is Pause -> {
-            context.mediaPlayer.pause()
+            context.mediaPlayer?.pause()
             PausedState(context, currentSong)
         }
         is Stop -> {
-            context.mediaPlayer.reset()
+            context.mediaPlayer?.reset()
+            if (context.executor != null) {
+                context.executor!!.shutdownNow()
+                context.executor = null
+                context.seekbarPositionUpdateTask = null
+                context.callback.updateSeekbarPosition(0)
+            }
             IdleState(context)
         }
         is Next -> {
-            context.mediaPlayer.reset()
+            context.mediaPlayer?.reset()
             if (context.playlist.size -1 > currentSong) {
                 currentSong += 1
             }else {
@@ -25,15 +31,17 @@ class PlayingState(context: PlayerContext, private var currentSong: Int) : State
             }
             val assetFileDescriptor = context.context.resources.openRawResourceFd(context.playlist[currentSong])
             try {
-                context.mediaPlayer.setDataSource(assetFileDescriptor)
-                context.mediaPlayer.prepare()
+                context.mediaPlayer?.setDataSource(assetFileDescriptor)
+                context.mediaPlayer?.prepare()
             } catch (e: Exception) {
             }
-            context.mediaPlayer.start()
+            val duration = context.mediaPlayer!!.duration
+            context.callback.updateSeekbarDuration(duration)
+            context.mediaPlayer?.start()
             PlayingState(context,currentSong)
         }
         is Prev -> {
-            context.mediaPlayer.reset()
+            context.mediaPlayer?.reset()
             if (currentSong > 0) {
                 currentSong -= 1
             }else {
@@ -41,11 +49,13 @@ class PlayingState(context: PlayerContext, private var currentSong: Int) : State
             }
             val assetFileDescriptor = context.context.resources.openRawResourceFd(context.playlist[currentSong])
             try {
-                context.mediaPlayer.setDataSource(assetFileDescriptor)
-                context.mediaPlayer.prepare()
+                context.mediaPlayer?.setDataSource(assetFileDescriptor)
+                context.mediaPlayer?.prepare()
             } catch (e: Exception) {
             }
-            context.mediaPlayer.start()
+            val duration = context.mediaPlayer!!.duration
+            context.callback.updateSeekbarDuration(duration)
+            context.mediaPlayer?.start()
             PlayingState(context,currentSong)
         }
     }

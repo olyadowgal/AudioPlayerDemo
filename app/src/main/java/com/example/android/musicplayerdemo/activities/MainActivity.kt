@@ -1,6 +1,7 @@
 package com.example.android.musicplayerdemo.activities
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
@@ -9,24 +10,24 @@ import com.example.android.musicplayerdemo.MainViewModel
 import com.example.android.musicplayerdemo.R
 import com.example.android.musicplayerdemo.stateMachine.Action.*
 import com.example.android.musicplayerdemo.stateMachine.PlayerStateMachine
-import com.example.android.musicplayerdemo.stateMachine.states.IdleState
+import com.example.android.musicplayerdemo.stateMachine.SeekbarCallback
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, SeekbarCallback {
+
     private val viewModel: MainViewModel by lazy {
         ViewModelProviders.of(this).get(MainViewModel::class.java)
     }
 
     companion object {
-        const val TAG = "MainActivity"
         const val MEDIA_RES_1 = R.raw.funky_town
         const val MEDIA_RES_2 = R.raw.the_man_who
     }
 
-    var playlist: MutableList<Int> = ArrayList()
+    private var playlist: MutableList<Int> = ArrayList()
     private var mUserIsSeeking = false
-    val playerSM: PlayerStateMachine = PlayerStateMachine(this)
+    private val playerSM: PlayerStateMachine = PlayerStateMachine(this, this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,19 +48,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onStart() {
         super.onStart()
-        playerSM.setPlaylist(playlist,Pause())
+        playerSM.setPlaylist(playlist, Pause())
 
     }
 
-//    override fun onStop() {
-//        super.onStop()
-//        if (isChangingConfigurations && mPlayerAdapter.isPlaying()) {
-//
-//        } else {
-//            mPlayerAdapter.release()
-//
-//        }
-//    }
+    override fun onStop() {
+        super.onStop()
+        playerSM.release()
+    }
 
     override fun onClick(view: View) {
         when (view.id) {
@@ -92,43 +88,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
                     mUserIsSeeking = false
-                    //mPlayerAdapter.seekTo(userSelectedPosition)
+                    playerSM.seekTo(userSelectedPosition)
                 }
             })
     }
     //endregion
 
+    //region Seekbar Callback
 
-    //region PlaybackListener
+    override fun updateSeekbarPosition(position: Int) {
+        if (!mUserIsSeeking) {
+            seekbar_audio.setProgress(position, true)
+        }
 
-//    inner class PlaybackListener : PlaybackInfoListener {
-//
-//        override fun onDurationChanged(duration: Int) {
-//            seekbar_audio.max = duration
-//            Log.d(TAG, String.format("setPlaybackDuration: setMax(%d)", duration))
-//        }
-//
-//        override fun onPositionChanged(position: Int) {
-//            if (!mUserIsSeeking) {
-//                seekbar_audio.setProgress(position, true)
-//                Log.d(TAG, String.format("setPlaybackPosition: setProgress(%d)", position))
-//            }
-//        }
-//
-//        override fun onStateChanged(state: State) {
-//            onLogUpdated(String.format("onStateChanged(%s)", state))
-//        }
-//
-//        override fun onPlaybackCompleted() {}
-//
-//        override fun onLogUpdated(formattedMessage: String) {
-//            if (text_debug != null) {
-//                text_debug.append(formattedMessage)
-//                text_debug.append("\n")
-//                // Moves the scrollContainer focus to the end
-//                scroll_container.post { scroll_container.fullScroll(ScrollView.FOCUS_DOWN) }
-//            }
-//        }
-//    }
-//    //endregion
+    }
+
+    override fun updateSeekbarDuration(duration: Int) {
+        seekbar_audio.max = duration
+    }
+
+    //endregion
+
+
 }
